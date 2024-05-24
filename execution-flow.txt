@@ -1,0 +1,115 @@
+Microservices - CQRS Design Pattern Development Steps:
+======================================================
+1. Create 2-Microservices with Below Dependencies
+	Microservice#1 : Product-Command-Service [POST,PUT,DELETE]
+	Microservice#2 : Product-Query-Service [GET]
+	
+	spring-web,spring-data-jpa,mysql,lombok,springboot-devtools,actuator
+
+2. Perform CURD operations 
+
+3. Test [Product-Command-Service-APIs] using POSTMAN TOOL.
+	i> Perform Insert, Update & Delete Operations
+
+4. Test [Product-Query-Service-APIs] using POSTMAN TOOL.
+	i> Perform Fetch Operations	[No Records Found]
+
+	>> >> Note: Both the Microservices are not Connected
+
+5. Add dep: 'Spring-for-Apache-Kafka' in both the Services
+
+6. Add Kafka-Producer related properties in the 'Product-Command-Service' 
+	Note: Producer will send the Messages to the Kafka Server(Kafka-Topic)
+
+7. Add Kafka-Consumer related properties in the 'Product-Query-Service' 
+	Note: Consumer will be connected with the KafkaServer(Kafka-Topic)
+	***>>> Both the Microservices are Connected using Apache Kafka.
+
+8. Start Zookeeper and Kafka Servers using Commands.
+
+	.\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+
+	.\bin\windows\kafka-server-start.bat .\config\server.properties
+
+9. Start the Producer Service : 'Product-Command-Service' 
+
+10. Start the Client Service : 'Product-Query-Service' 
+
+11. Save the Records using POSTMAN TOOL.
+	- Verify Product_Command_Tbl
+	- Verify Product_Query_Tbl
+
+12. Update the Records using POSTMAN TOOL.
+	- Verify Product_Command_Tbl
+	- Verify Product_Query_Tbl
+
+13. Delete the Records using POSTMAN TOOL.
+	- Verify Product_Command_Tbl
+	- Verify Product_Query_Tbl
+
+Note: We have seperated READ and WRITE Operations using CQRS Design Pattern.
+
+________________________________________________________________________
+
+POSTMAN SCREENS:  
+================
+		[PRODUCT-COMMAND-SERVICE]
+		*************************
+Request To Save Product ::	
+-------------------------------------------------------
+POST	  http://localhost:8081/api/products	SEND
+-------------------------------------------------------
+{
+  "eventType": "CREATE_PRODUCT",
+  "product": {
+   
+    "productName": "LAPTOP",
+    "productCost": 89000.00,
+    "productDescription": "LENOVO-LAPTOP"
+  }
+}
+-------------------------------------------------------
+
+Request To Update Product ::
+-------------------------------------------------------
+PUT	  http://localhost:8081/api/products/1 	 SEND
+-------------------------------------------------------
+{
+  "eventType": "UPDATE_PRODUCT",
+  "product": {
+  
+    "productName": "LAPTOP-UPDATE",
+    "productCost": 99999.00,
+    "productDescription": "LENOVO-LAPTOP-UPDATE"
+  }
+}
+-------------------------------------------------------
+
+Request To Delete Product ::
+-------------------------------------------------------
+DELETE	   http://localhost:8081/api/products/1    SEND
+-------------------------------------------------------
+
+
+		[PRODUCT-COMMAND-SERVICE]
+		*************************
+Request To Fetch All Products ::
+-------------------------------------------------------
+GET	   http://localhost:8082/api/products    SEND
+-------------------------------------------------------
+
+
+Request To Fetch Product By Product-Id ::
+-------------------------------------------------------
+GET	   http://localhost:8082/api/products/1    SEND
+-------------------------------------------------------
+
+NOTE: BOTH THE TABLES PRIMARY-KEY VALUES MUST BE SAME WHEN WE WANT TO PERFORM UPDATE AND DELETE OPERATIONS., OTHERWISE WILL GET EXCEPTION LIKE: NO VALUE PRESENT
+
+==>> CREATE NEW TABLES WHEN WE WANT TO CHECK BOTH THE SERVICES INTERACTIONS.
+
+Use below property before testing both the Services ::
+``````````````````````````````````````````````````````
+spring.jpa.hibernate.ddl-auto=create
+
+
